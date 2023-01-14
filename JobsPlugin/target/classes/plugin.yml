@@ -1,0 +1,27 @@
+name: Jobs
+version: '1.0-SNAPSHOT'
+main: Jobs.Jobs
+api-version: 1.19
+commands:
+  skills:
+    description: "Open's the skills menu"
+    aliases: skill
+  job:
+    description: show balance
+permissions:
+  jobs.command.selectJob:
+    description: Let's you select a job
+  jobs.command.selectJobAdmin:
+    description: Let's you change a job for other players
+  jobs.command.showJobScoreboard:
+    description: Ability to show the Job Debug Scoreboard
+  jobs.command.hideJobScoreboard:
+    description: Ability to hide the Job Debug Scoreboard
+  jobs.command.*:
+    children:
+      jobs.command.selectJob: true
+      jobs.command.selectJobAdmin: true
+      jobs.command.showJobScoreboard: true
+      jobs.command.hideJobScoreboard: true
+
+

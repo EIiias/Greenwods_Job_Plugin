@@ -25,7 +25,11 @@ public final class Jobs extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-
+        /*
+        Creo
+        WAR!!!
+        HIER!!!!!
+         */
         instance = this;
 
         //Create [PluginFolder]/JobsPlugin directory if nonexistent

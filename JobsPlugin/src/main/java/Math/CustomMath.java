@@ -4,6 +4,7 @@ public class CustomMath {
 
     public static double truncate(double value, int decimalPlaces) {
         double multiplier = Math.pow(10, decimalPlaces);
+        System.out.println("hello world!");
         return Math.floor(value * multiplier) / multiplier;
     }
 

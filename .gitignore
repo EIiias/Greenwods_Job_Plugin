@@ -1,2 +1,2 @@
-JobsPlugin/.idea
-JobsPlugin/target
+JobsPlugin/.idea/*
+JobsPlugin/target/*

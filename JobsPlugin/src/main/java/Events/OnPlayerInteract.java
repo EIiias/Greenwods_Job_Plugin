@@ -19,6 +19,7 @@ public class OnPlayerInteract extends @NotNull ItemStack implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
 
+        //Reset job to unemployed if player uses job reset token
         if (e.getItem() != null) {
             if (e.getItem().getType() == Material.WRITTEN_BOOK) {
                 ItemStack mainHandItem = e.getItem();

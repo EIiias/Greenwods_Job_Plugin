@@ -13,6 +13,8 @@ public class OnCropGrow implements Listener {
     @EventHandler
     public void onPlantGrowth(BlockGrowEvent e) {
 
+        //Remove metadata if block placed by player grows
+
         Plugin pl = Bukkit.getPluginManager().getPlugin("Jobs");
         Block b = e.getBlock();
 

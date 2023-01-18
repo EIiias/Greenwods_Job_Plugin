@@ -19,6 +19,7 @@ public class OnInventoryClick implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
 
+        //Check if inventory is a skill tree inventory and cancel all click events in that case
         if (SkillTree.skillTreeInventoryList.containsKey(e.getInventory())) {
 
             e.setCancelled(true);

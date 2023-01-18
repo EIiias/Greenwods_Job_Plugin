@@ -11,6 +11,7 @@ public class OnStructureGrow implements Listener {
     //Removes "PlacedByPlayer" metadata from all blocks
     @EventHandler
     public void onStructureGrow(StructureGrowEvent e) {
+        //Remove metadata for all blocks when f.e. a tree grows
         Plugin pl = Bukkit.getPluginManager().getPlugin("Jobs");
         for (int i = 0; i < e.getBlocks().size(); i++) {
             if (e.getBlocks().get(i).hasMetadata("PlacedByPlayer")); {

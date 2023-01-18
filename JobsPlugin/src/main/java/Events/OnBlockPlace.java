@@ -16,6 +16,7 @@ public class OnBlockPlace implements Listener {
         Block b = e.getBlock();
         Player p = e.getPlayer();
 
+        //Add metadata to know which blocks were placed by players
         b.setMetadata("PlacedByPlayer", new FixedMetadataValue(Jobs.getInstance(), p.getName()));
     }
 }

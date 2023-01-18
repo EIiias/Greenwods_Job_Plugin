@@ -20,6 +20,7 @@ public class OnBlockBreak implements Listener {
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent e) {
 
+        //Cancel if event is cancelled
         if (e.isCancelled()) {
             return;
         }
@@ -35,11 +36,13 @@ public class OnBlockBreak implements Listener {
             run(p, e.getBlock().getLocation());
         }
 
+        //Remove metadata if block was placed by placed
         if (b.hasMetadata("PlacedByPlayer")) {
             b.removeMetadata("PlacedByPlayer", Jobs.getInstance());
             return;
         }
 
+        //Remove actions required if job material
         if (ps.materialHandler.isJobMaterial(p, m)) {
             ps.decreaseActionsRequired(ps.materialHandler.getMaterialValue(m));
         }

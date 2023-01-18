@@ -34,7 +34,7 @@ public class PlayerSkills {
     public PlayerSkills() {
 
         /*
-        XP Required for
+        XP Required for Lumberjack
          */
 
         lumberjackRequiredXPPerLevel.add(40.0); //Level 2

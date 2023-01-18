@@ -89,6 +89,7 @@ public class PlayerStats {
         this.earningMultiplier = earningMultiplier;
     }
 
+    //Keeps tracks if player should get money and level up
     public void decreaseActionsRequired(double amount) {
         actionsRequired -= amount;
 

@@ -23,12 +23,14 @@ public class OnPlayerFish implements Listener {
         Player p = e.getPlayer();
         PlayerStats ps = PlayerStats.getPlayerStats(p);
 
+        //Abort function if player is not fisher
         if (!ps.getJobName().equals("fisher")) {
             return;
         }
 
         Economy economy = Vault.getEconomy();
 
+        //Check if player fished something
         if (e.getState().name().equals("CAUGHT_FISH")) {
             double randomVal = CustomMath.randomNumber(90, 110) / 100;
             economy.depositPlayer(p, randomVal);

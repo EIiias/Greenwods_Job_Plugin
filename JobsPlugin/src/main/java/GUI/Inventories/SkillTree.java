@@ -85,6 +85,7 @@ public class SkillTree {
             }
         }
 
+        //Create back button and represent as player's head
         ItemStack backButton = new ItemStack(Material.PLAYER_HEAD);
 
         SkullMeta backButtonMeta = (SkullMeta) backButton.getItemMeta();
@@ -96,6 +97,6 @@ public class SkillTree {
 
         owningPlayer.openInventory(skillTreeMenu);
     }
-
+    //Map skill tree inventory with class instance
     public static HashMap<Inventory, SkillTree> skillTreeInventoryList = new HashMap<>();
 }

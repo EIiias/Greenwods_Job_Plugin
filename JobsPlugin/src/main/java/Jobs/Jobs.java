@@ -26,6 +26,7 @@ public final class Jobs extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
 
+        //Store this instance for access later
         instance = this;
 
         //Create [PluginFolder]/JobsPlugin directory if nonexistent
@@ -66,6 +67,7 @@ public final class Jobs extends JavaPlugin implements Listener {
         Bukkit.getServer().getPluginManager().registerEvents(new OnInventoryClick(), this);
         Bukkit.getServer().getPluginManager().registerEvents(new OnPlayerCraft(), this);
 
+        //Save player stats for all online players
         for (Player p : Bukkit.getOnlinePlayers()) {
 
             PlayerStats ps = new PlayerStats(p);
@@ -78,7 +80,7 @@ public final class Jobs extends JavaPlugin implements Listener {
             }
         }
 
-        //Custom Crafting rec
+        //Custom Crafting test
         NamespacedKey customRecipeKey = new NamespacedKey(this, "test_item");
 
         ItemStack customRecipeItem = new ItemStack(Material.OAK_PLANKS, 6);
@@ -97,7 +99,7 @@ public final class Jobs extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
 
-        //Save stats for all players
+        //Save stats for all online players
         for (Player p : Bukkit.getOnlinePlayers()) {
             PlayerStats.getPlayerStats(p).savePlayerStatsInRam();
         }

@@ -16,6 +16,7 @@ public class OnInventoryClose implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
 
+        //Remove inventory from skill tree list and delete inventory
         if (SkillTree.skillTreeInventoryList.containsKey(e.getInventory())) {
             SkillTree skillTreeInstance = SkillTree.skillTreeInventoryList.get(e.getInventory());
             SkillTree.skillTreeInventoryList.remove(e.getInventory());

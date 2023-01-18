@@ -33,6 +33,7 @@ public class PlayerSkills {
 
     public PlayerSkills() {
 
+        
         /*
         XP Required for
          */

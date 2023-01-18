@@ -1,13 +1,22 @@
 package PlayerData;
 
+import Jobs.Jobs;
 import PlayerData.PlayerStats;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class MaterialHandler {
@@ -20,8 +29,14 @@ public class MaterialHandler {
     private HashMap<Material, String> materialName = new HashMap<>();
     private HashMap<Material, String> materialOccupationOwner = new HashMap<>();
     private HashMap<Material, Material> materialAliases = new HashMap<>();
+
     public ArrayList<ItemStack> customFishingLoot = new ArrayList<>();
-    public  ArrayList<Entity> customFishingEntities = new ArrayList<>();
+    public ArrayList<ItemStack> commonFish = new ArrayList<>();
+    public ArrayList<ItemStack> uncommonFish = new ArrayList<>();
+    public ArrayList<ItemStack> rareFish = new ArrayList<>();
+    public ArrayList<ItemStack> epicFish = new ArrayList<>();
+    public ArrayList<ItemStack> legendaryFish = new ArrayList<>();
+
 
     /*
     Class constructor
@@ -136,6 +151,64 @@ public class MaterialHandler {
         Custom Fishing loot
          */
 
+        //Items
+        customFishingLoot.add(new ItemStack(Material.TOTEM_OF_UNDYING));
+        epicFish.add(customFishingLoot.get(0));
+        customFishingLoot.add(new ItemStack(Material.HEART_OF_THE_SEA));
+        rareFish.add(customFishingLoot.get(1));
+        customFishingLoot.add(new ItemStack(Material.NAME_TAG));
+        epicFish.add(customFishingLoot.get(2));
+        customFishingLoot.add(new ItemStack(Material.NAUTILUS_SHELL));
+        rareFish.add(customFishingLoot.get(3));
+        customFishingLoot.add(new ItemStack(Material.IRON_NUGGET, 3));
+        commonFish.add(customFishingLoot.get(4));
+        customFishingLoot.add(new ItemStack(Material.GOLD_NUGGET, 3));
+        commonFish.add(customFishingLoot.get(5));
+        customFishingLoot.add(new ItemStack(Material.IRON_ORE));
+        commonFish.add(customFishingLoot.get(6));
+        customFishingLoot.add(new ItemStack(Material.GOLD_INGOT));
+        uncommonFish.add(customFishingLoot.get(7));
+        customFishingLoot.add(new ItemStack(Material.LEATHER_BOOTS));
+        commonFish.add(customFishingLoot.get(8));
+
+        /*
+        Custom Fishes
+         */
+
+        //Common Fishes
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.COD), 0.5, "Common Carp", "common"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.SALMON), 0.5, "Tuna", "common"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.COD), 0.5, "Sardine", "common"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.SALMON), 0.5, "Salmon", "common"));
+
+        //Uncommon Fishes
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.COD), 2.0, "Goldfish", "uncommon"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.COD), 2.0, "Atlantic Cod", "uncommon"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.COD), 2.0, "Trout", "uncommon"));
+
+        //Rare Fishes
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.COD), 10.0, "Catfish", "rare"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.PUFFERFISH), 10.0, "Pufferfish", "rare"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.NAUTILUS_SHELL), 10.0, "Crab", "rare"));
+
+        //Epic Fishes
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.COD), 25.0, "Sword Fish", "epic"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.COD), 25.0, "Shark", "epic"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.TROPICAL_FISH), 25.0, "Koi", "epic"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.COD), 25.0, "Dolphin", "epic"));
+
+        //Legendary Fishes
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.COD), 75.0, "Whale", "legendary"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.TROPICAL_FISH), 75.0, "Creo Blub", "legendary"));
+        customFishingLoot.add(createCustomFish(new ItemStack(Material.TROPICAL_FISH), 75.0, "Nemo", "legendary"));
+
+
+
+
+
+
+
+
     }
 
     /*
@@ -171,5 +244,54 @@ public class MaterialHandler {
         }
 
         return materialValue.get(m);
+    }
+
+    public ItemStack createCustomFish(ItemStack fish, Double fishValue, String fishName, String rarity) {
+
+        //Get item meta
+        ItemMeta fishItemMeta = fish.getItemMeta();
+
+        //Store value in fish item
+        PersistentDataContainer fishPDC = fishItemMeta.getPersistentDataContainer();
+        fishPDC.set(new NamespacedKey(Jobs.getInstance(), "FishValue"), PersistentDataType.DOUBLE, fishValue);
+
+        //Set color based on rarity
+        ChatColor fishTextColor = null;
+        switch (rarity) {
+            case "common" -> {
+                fishTextColor = ChatColor.DARK_GRAY;
+                commonFish.add(fish);
+            } case "uncommon" -> {
+                fishTextColor = ChatColor.GREEN;
+                uncommonFish.add(fish);
+            } case "rare" -> {
+                fishTextColor = ChatColor.AQUA;
+                rareFish.add(fish);
+            } case "epic" -> {
+                fishTextColor = ChatColor.LIGHT_PURPLE;
+                epicFish.add(fish);
+            } case "legendary" -> {
+                fishTextColor = ChatColor.GOLD;
+                legendaryFish.add(fish);
+            }
+        }
+
+        //Set item name to custom name
+        fishItemMeta.setDisplayName(fishTextColor + ChatColor.BOLD.toString() + fishName);
+
+        //Add lore (make attributes visible to players)
+        ArrayList<String> lore = new ArrayList<>();
+        lore.add(fishTextColor + "Rarity: " + rarity.toUpperCase());
+        lore.add(fishTextColor + "Can be sold for: ♧" + fishValue);
+        fishItemMeta.setLore(lore);
+
+        //Add glint without showing an enchantment
+        fishItemMeta.addEnchant(Enchantment.MENDING, 1, true);
+        fishItemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+
+        //Apply item meta
+        fish.setItemMeta(fishItemMeta);
+
+        return fish;
     }
 }

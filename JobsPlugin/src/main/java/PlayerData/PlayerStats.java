@@ -97,10 +97,13 @@ public class PlayerStats {
                 playerSkills.increaseLumberjackXP(owningPlayer, amount);
             }
             case "miner" -> {
-                playerSkills.increaseMinerXP(amount);
+                playerSkills.increaseMinerXP(owningPlayer, amount);
             }
             case "farmer" -> {
-                 playerSkills.increaseFarmerXP(amount);
+                 playerSkills.increaseFarmerXP(owningPlayer, amount);
+            }
+            case "fisher" -> {
+                playerSkills.increaseFisherXP(owningPlayer, amount);
             }
         }
 

@@ -24,7 +24,7 @@ public class PlayerSkills {
     public int fisherLevel = 0;
 
     public double farmerXP = 0;
-    public double farmerRequiredXP = 100;
+    public double farmerRequiredXP = 20;
     public int farmerLevel = 0;
 
     public double minerXP = 0;
@@ -230,7 +230,7 @@ public class PlayerSkills {
     }
 
 
-    //Lumberjaack
+    //Lumberjack
     public void increaseLumberjackXP(Player p, double amount) {
         lumberjackXP += amount;
 
@@ -286,7 +286,7 @@ public class PlayerSkills {
             fisherLevel++;
             fisherRequiredXP = fisherRequiredXPPerLevel.get(fisherLevel - 1);
             p.playSound(p, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-            p.sendMessage(ChatColor.GREEN + "Lumberjack level up! [" + fisherLevel + "]");
+            p.sendMessage(ChatColor.GREEN + "Fisher level up! [" + fisherLevel + "]");
             PlayerStats ps = PlayerStats.getPlayerStats(p);
 
             switch (fisherLevel) {
@@ -300,11 +300,11 @@ public class PlayerSkills {
                 case 20 -> {
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: 'Refined Woodwork' - get 6 planks from logs");
+                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                 }
                 case 40 -> {
-                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + p.getName() + " has reached the max level [" + fisherLevel + "] for Lumberjack!");
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: 'Timber Mod' - Break adjacent logs (Max 5)");
+                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + p.getName() + " has reached the max level [" + fisherLevel + "] for Fisher!");
+                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
                     for (Player t : Bukkit.getOnlinePlayers()) {
@@ -329,7 +329,7 @@ public class PlayerSkills {
             minerLevel++;
             minerRequiredXP = minerRequiredXPPerLevel.get(minerLevel - 1);
             p.playSound(p, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-            p.sendMessage(ChatColor.GREEN + "Lumberjack level up! [" + minerLevel + "]");
+            p.sendMessage(ChatColor.GREEN + "Miner level up! [" + minerLevel + "]");
             PlayerStats ps = PlayerStats.getPlayerStats(p);
 
             switch (minerLevel) {
@@ -343,11 +343,11 @@ public class PlayerSkills {
                 case 20 -> {
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: 'Refined Woodwork' - get 6 planks from logs");
+                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                 }
                 case 40 -> {
-                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + p.getName() + " has reached the max level [" + minerLevel + "] for Lumberjack!");
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: 'Timber Mod' - Break adjacent logs (Max 5)");
+                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + p.getName() + " has reached the max level [" + minerLevel + "] for Miner!");
+                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
                     for (Player t : Bukkit.getOnlinePlayers()) {
@@ -372,7 +372,7 @@ public class PlayerSkills {
             farmerLevel++;
             farmerRequiredXP = farmerRequiredXPPerLevel.get(farmerLevel - 1);
             p.playSound(p, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-            p.sendMessage(ChatColor.GREEN + "Lumberjack level up! [" + farmerLevel + "]");
+            p.sendMessage(ChatColor.GREEN + "Farmer level up! [" + farmerLevel + "]");
             PlayerStats ps = PlayerStats.getPlayerStats(p);
 
             switch (farmerLevel) {
@@ -386,11 +386,11 @@ public class PlayerSkills {
                 case 20 -> {
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: 'Refined Woodwork' - get 6 planks from logs");
+                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                 }
                 case 40 -> {
-                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + p.getName() + " has reached the max level [" + farmerLevel + "] for Lumberjack!");
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: 'Timber Mod' - Break adjacent logs (Max 5)");
+                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + p.getName() + " has reached the max level [" + farmerLevel + "] for Farmer!");
+                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
                     for (Player t : Bukkit.getOnlinePlayers()) {

@@ -193,7 +193,7 @@ public class PlayerSkills {
         minerRequiredXPPerLevel.add(790.0);
         minerRequiredXPPerLevel.add(820.0);
         minerRequiredXPPerLevel.add(850.0);
-        minerRequiredXPPerLevel.add(880.0); //Level 25
+        minerRequiredXPPerLevel.add(880.0); //Level 35
         minerRequiredXPPerLevel.add(910.0);
         minerRequiredXPPerLevel.add(928.0);
         minerRequiredXPPerLevel.add(936.0);

@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.checkerframework.checker.units.qual.C;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -35,23 +36,23 @@ public class SkillTree {
         skillTreeInventoryList.put(skillTreeMenu, this);
 
         ItemMeta lumberJackIconMeta = lumberJackIcon.getItemMeta();
-        lumberJackIconMeta.setDisplayName("Lumberjack");
-        lumberJackIconMeta.setLore(Arrays.asList("Level: " + playerSkills.lumberjackLevel));
+        lumberJackIconMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.GREEN + "Lumberjack");
+        lumberJackIconMeta.setLore(Arrays.asList(ChatColor.GREEN + "Level: " + ChatColor.WHITE + playerSkills.lumberjackLevel));
         lumberJackIcon.setItemMeta(lumberJackIconMeta);
 
         ItemMeta minerIconMeta = minerIcon.getItemMeta();
-        minerIconMeta.setDisplayName("Miner");
-        minerIconMeta.setLore(Arrays.asList("Level: " + playerSkills.minerLevel));
+        minerIconMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.DARK_GRAY + "Miner");
+        minerIconMeta.setLore(Arrays.asList(ChatColor.DARK_GRAY + "Level: " + ChatColor.WHITE + playerSkills.minerLevel));
         minerIcon.setItemMeta(minerIconMeta);
 
         ItemMeta fisherIconMeta = fisherIcon.getItemMeta();
-        fisherIconMeta.setDisplayName("Fisher");
-        fisherIconMeta.setLore(Arrays.asList("Level: " + playerSkills.fisherLevel));
+        fisherIconMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.AQUA + "Fisher");
+        fisherIconMeta.setLore(Arrays.asList(ChatColor.AQUA + "Level: " + ChatColor.WHITE + playerSkills.minerLevel));
         fisherIcon.setItemMeta(fisherIconMeta);
 
         ItemMeta farmerIconMeta = farmerIcon.getItemMeta();
-        farmerIconMeta.setDisplayName("Farmer");
-        farmerIconMeta.setLore(Arrays.asList("Level: " + playerSkills.farmerLevel));
+        farmerIconMeta.setDisplayName(ChatColor.BOLD + "" + ChatColor.YELLOW + "Farmer");
+        farmerIconMeta.setLore(Arrays.asList(ChatColor.YELLOW + "Level: " + ChatColor.WHITE + playerSkills.farmerLevel));
         farmerIcon.setItemMeta(farmerIconMeta);
 
         skillTreeMenu.setItem(0, lumberJackIcon);

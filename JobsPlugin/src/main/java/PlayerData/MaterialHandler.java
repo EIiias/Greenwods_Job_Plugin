@@ -164,12 +164,14 @@ public class MaterialHandler {
         commonFish.add(customFishingLoot.get(4));
         customFishingLoot.add(new ItemStack(Material.GOLD_NUGGET, 3));
         commonFish.add(customFishingLoot.get(5));
-        customFishingLoot.add(new ItemStack(Material.IRON_ORE));
+        customFishingLoot.add(new ItemStack(Material.IRON_INGOT));
         commonFish.add(customFishingLoot.get(6));
         customFishingLoot.add(new ItemStack(Material.GOLD_INGOT));
         uncommonFish.add(customFishingLoot.get(7));
         customFishingLoot.add(new ItemStack(Material.LEATHER_BOOTS));
         commonFish.add(customFishingLoot.get(8));
+        customFishingLoot.add(new ItemStack(Material.TRIDENT));
+        commonFish.add(customFishingLoot.get(9));
 
         /*
         Custom Fishes

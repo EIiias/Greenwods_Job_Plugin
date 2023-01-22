@@ -8,6 +8,8 @@ commands:
     aliases: skill
   job:
     description: show balance
+  backpack:
+    description: Work in progress
 permissions:
   jobs.command.selectJob:
     description: Let's you select a job

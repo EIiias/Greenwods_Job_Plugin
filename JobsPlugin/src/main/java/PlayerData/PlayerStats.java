@@ -3,6 +3,7 @@ package PlayerData;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import Math.CustomMath;
 import Economy.Vault;
@@ -32,6 +33,9 @@ public class PlayerStats {
     private double baseWage = 5;
 
     private double earningMultiplier = 1;
+
+    public Location lastFishingPosition = null;
+    public Boolean autoFishFlag = false;
 
     private ArrayList<String> saveStatsNames = new ArrayList<>();
 
@@ -103,6 +107,7 @@ public class PlayerStats {
             case "farmer" -> {
                  playerSkills.increaseFarmerXP(amount);
             }
+            //Since fisher works different it's not here
         }
 
         //Check if player has done enough actions for the next reward and reset if yes

@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import Commands.JobCommand;
 import Commands.SkillsCommand;
 import Events.*;
+import GUI.Inventories.FisherBackpack;
 import PlayerData.PlayerStats;
 import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.Bukkit;
@@ -53,6 +54,8 @@ public final class Jobs extends JavaPlugin implements Listener {
         getCommand("job").setTabCompleter(new JobCommand());
         getCommand("skills").setExecutor(new SkillsCommand());
         getCommand("skills").setTabCompleter(new SkillsCommand());
+        getCommand("backpack").setExecutor(new FisherBackpack());
+        getCommand("backpack").setExecutor(new FisherBackpack());
 
         //Register Event Listener
         Bukkit.getServer().getPluginManager().registerEvents(new OnBlockBreak(), this);

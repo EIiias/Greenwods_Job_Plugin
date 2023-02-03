@@ -4,6 +4,7 @@ import Jobs.Jobs;
 import PlayerData.MaterialHandler;
 import PlayerData.PlayerStats;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -35,13 +36,17 @@ public class OnBlockBreak implements Listener {
 
         PlayerStats ps = PlayerStats.getPlayerStats(p);
 
-        //Timber skill only works if broken block is wood and player's lumberjack level is 40 or higher
-        if (ps.playerSkills.lumberjackLevel >= 40 && ps.materialHandler.isJobMaterial(p, b.getType())) {
+        //Timber skill only works if broken block is lumberjack job material, player's lumberjack level is 40 or higher and no cooldown
+        if (ps.timberSkill && !ps.timberSkillCooldown && MaterialHandler.getOwningJob(b.getType()).equals("lumberjack")) {
+
+            //Start Cooldown
+            ps.timberSkillCooldown = true;
+            startTimberSkillCooldown(ps);
 
             //The range of the timber skill
-            int xRange = 5;
+            int xRange = 7;
             int yRange = 15;
-            int zRange = 5;
+            int zRange = 7;
 
             ArrayList<Block> blocksToBreak = new ArrayList<>();
 
@@ -67,39 +72,38 @@ public class OnBlockBreak implements Listener {
             }
 
             //Send all blocks in timber skill range to function
-            run(p, blocksToBreak);
+            startBlockBreaking(p, blocksToBreak);
             return;
         }
 
-        //Remove metadata if block was placed by placed
+        //Remove metadata if block was placed by player
         if (b.hasMetadata("PlacedByPlayer")) {
             b.removeMetadata("PlacedByPlayer", Jobs.getInstance());
             return;
         }
 
         //Remove actions required if job material
-        if (ps.materialHandler.isJobMaterial(p, m)) {
-            ps.decreaseActionsRequired(ps.materialHandler.getMaterialValue(m));
+        if (ps.getMaterialHandler().isJobMaterial(m)) {
+            ps.decreaseActionsRequired(ps.getMaterialHandler().getMaterialValue(m));
         }
     }
-    private void run(Player p, ArrayList<Block> blocksToBreak) {
+    
+    private void startBlockBreaking(Player p, ArrayList<Block> blocksToBreak) {
         new BukkitRunnable() {
 
             //Current iteration
             private int i = 0;
-            //How much should be subtracted from actionsRequired
-            private double reward = 0;
 
             @Override
             public void run() {
 
-                if (i >= blocksToBreak.size() - 1) {
-                    p.sendMessage("Max Range");
-                    Bukkit.getScheduler().cancelTask(getTaskId());
-                }
-
-                //Skip current block until it should be broken
-                while (!PlayerStats.getPlayerStats(p).materialHandler.isJobMaterial(p, blocksToBreak.get(i).getType())) {
+                //Skip current block until a block should be broken by this skill
+                while (!MaterialHandler.getOwningJob(blocksToBreak.get(i).getType()).equalsIgnoreCase("lumberjack")) {
+                    //Cancel process if end of list is reached
+                    if (i >= blocksToBreak.size() - 1) {
+                        Bukkit.getScheduler().cancelTask(getTaskId());
+                        return;
+                    }
                     i++;
                 }
 
@@ -107,17 +111,27 @@ public class OnBlockBreak implements Listener {
                 if (blocksToBreak.get(i).hasMetadata("PlacedByPlayer")) {
                     blocksToBreak.get(i).removeMetadata("PlacedByPlayer", Jobs.getInstance());
                 } else {
-                    reward += PlayerStats.getPlayerStats(p).materialHandler.getMaterialValue(blocksToBreak.get(i).getType());
+                    //Decrease Actions required
+                    PlayerStats.getPlayerStats(p).decreaseActionsRequired(PlayerStats.getPlayerStats(p).getMaterialHandler().getMaterialValue(blocksToBreak.get(i).getType()));
                 }
 
                 //Break the block
                 blocksToBreak.get(i).breakNaturally();
 
                 i++;
-
-                //Decrease actions required based on reward
-                PlayerStats.getPlayerStats(p).decreaseActionsRequired(reward);
             }
-        }.runTaskTimer(Jobs.getInstance(), 0, 3);
+        }.runTaskTimer(Jobs.getInstance(), 0, 2);
+    }
+
+    //Start the cooldown for the timber skill
+    private void startTimberSkillCooldown(PlayerStats ps) {
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                ps.timberSkillCooldown = false;
+                ps.owningPlayer.sendActionBar(ChatColor.AQUA + "Timber Skill is now available!");
+            }
+        }.runTaskLater(Jobs.getInstance(), 100);
     }
 }

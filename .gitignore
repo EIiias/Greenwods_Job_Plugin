@@ -1,3 +1,7 @@
 JobsPlugin/.idea/*
 JobsPlugin/target/*
 JobsPlugin/Jobs.iml
+.idea/Greenwods_Job_Plugin.iml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml

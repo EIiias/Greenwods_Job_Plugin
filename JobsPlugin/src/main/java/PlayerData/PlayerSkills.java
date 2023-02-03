@@ -9,6 +9,8 @@ import java.util.ArrayList;
 
 public class PlayerSkills {
 
+    public Player owningPlayer;
+
     public ArrayList<Double> lumberjackRequiredXPPerLevel = new ArrayList<>();
     public ArrayList<Double> fisherRequiredXPPerLevel = new ArrayList<>();
     public ArrayList<Double> farmerRequiredXPPerLevel = new ArrayList<>();
@@ -31,7 +33,9 @@ public class PlayerSkills {
     public double minerRequiredXP = 20;
     public int minerLevel = 0;
 
-    public PlayerSkills() {
+    public PlayerSkills(Player p) {
+
+        owningPlayer = p;
 
         /*
         XP Required for Lumberjack
@@ -231,7 +235,7 @@ public class PlayerSkills {
 
 
     //Lumberjack
-    public void increaseLumberjackXP(Player p, double amount) {
+    public void increaseLumberjackXP(double amount) {
         lumberjackXP += amount;
 
         if (lumberjackXP >= lumberjackRequiredXP) {
@@ -242,9 +246,9 @@ public class PlayerSkills {
             lumberjackXP = 0;
             lumberjackLevel++;
             lumberjackRequiredXP = lumberjackRequiredXPPerLevel.get(lumberjackLevel - 1);
-            p.playSound(p, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-            p.sendMessage(ChatColor.GREEN + "Lumberjack level up! [" + lumberjackLevel + "]");
-            PlayerStats ps = PlayerStats.getPlayerStats(p);
+            owningPlayer.playSound(owningPlayer, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+            owningPlayer.sendMessage(ChatColor.GREEN + "Lumberjack level up! [" + lumberjackLevel + "]");
+            PlayerStats ps = PlayerStats.getPlayerStats(owningPlayer);
 
             switch (lumberjackLevel) {
                 case 1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24, 26, 27, 28, 29, 31, 32, 33, 34, 36, 37, 38, 39 -> {
@@ -257,15 +261,16 @@ public class PlayerSkills {
                 case 20 -> {
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: 'Refined Woodwork' - get 6 planks from logs");
+                    owningPlayer.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: 'Refined Woodwork' - get 6 planks from logs");
                 }
                 case 40 -> {
-                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + p.getName() + " has reached the max level [" + lumberjackLevel + "] for Lumberjack!");
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: 'Timber Mod' - Break adjacent logs (Max 5)");
+                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + owningPlayer.getName() + " has reached the max level [" + lumberjackLevel + "] for Lumberjack!");
+                    owningPlayer.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: 'Timber Mod' - Automatically break whole tress!");
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
+                    ps.timberSkill = true;
                     for (Player t : Bukkit.getOnlinePlayers()) {
-                        t.playSound(t ,Sound.ENTITY_ENDER_DRAGON_DEATH, 1, 1);
+                        t.playSound(t, Sound.ENTITY_ENDER_DRAGON_DEATH, 1, 1);
                     }
                 }
             }
@@ -274,7 +279,7 @@ public class PlayerSkills {
 
 
     //Fisher
-    public void increaseFisherXP(Player p, double amount) {
+    public void increaseFisherXP(double amount) {
         fisherXP += amount;
 
         if (fisherXP >= fisherRequiredXP) {
@@ -285,9 +290,9 @@ public class PlayerSkills {
             fisherXP = 0;
             fisherLevel++;
             fisherRequiredXP = fisherRequiredXPPerLevel.get(fisherLevel - 1);
-            p.playSound(p, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-            p.sendMessage(ChatColor.GREEN + "Fisher level up! [" + fisherLevel + "]");
-            PlayerStats ps = PlayerStats.getPlayerStats(p);
+            owningPlayer.playSound(owningPlayer, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+            owningPlayer.sendMessage(ChatColor.GREEN + "Fisher level up! [" + fisherLevel + "]");
+            PlayerStats ps = PlayerStats.getPlayerStats(owningPlayer);
 
             switch (fisherLevel) {
                 case 1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24, 26, 27, 28, 29, 31, 32, 33, 34, 36, 37, 38, 39 -> {
@@ -300,11 +305,11 @@ public class PlayerSkills {
                 case 20 -> {
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
+                    owningPlayer.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                 }
                 case 40 -> {
-                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + p.getName() + " has reached the max level [" + fisherLevel + "] for Fisher!");
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
+                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + owningPlayer.getName() + " has reached the max level [" + fisherLevel + "] for Fisher!");
+                    owningPlayer.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
                     for (Player t : Bukkit.getOnlinePlayers()) {
@@ -317,7 +322,7 @@ public class PlayerSkills {
 
 
     //Miner
-    public void increaseMinerXP(Player p, double amount) {
+    public void increaseMinerXP(double amount) {
         minerXP += amount;
 
         if (minerXP >= minerRequiredXP) {
@@ -328,9 +333,9 @@ public class PlayerSkills {
             minerXP = 0;
             minerLevel++;
             minerRequiredXP = minerRequiredXPPerLevel.get(minerLevel - 1);
-            p.playSound(p, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-            p.sendMessage(ChatColor.GREEN + "Miner level up! [" + minerLevel + "]");
-            PlayerStats ps = PlayerStats.getPlayerStats(p);
+            owningPlayer.playSound(owningPlayer, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+            owningPlayer.sendMessage(ChatColor.GREEN + "Miner level up! [" + minerLevel + "]");
+            PlayerStats ps = PlayerStats.getPlayerStats(owningPlayer);
 
             switch (minerLevel) {
                 case 1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24, 26, 27, 28, 29, 31, 32, 33, 34, 36, 37, 38, 39 -> {
@@ -343,11 +348,11 @@ public class PlayerSkills {
                 case 20 -> {
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
+                    owningPlayer.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                 }
                 case 40 -> {
-                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + p.getName() + " has reached the max level [" + minerLevel + "] for Miner!");
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
+                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + owningPlayer.getName() + " has reached the max level [" + minerLevel + "] for Miner!");
+                    owningPlayer.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
                     for (Player t : Bukkit.getOnlinePlayers()) {
@@ -360,7 +365,7 @@ public class PlayerSkills {
 
 
     //Farmer
-    public void increaseFarmerXP(Player p, double amount) {
+    public void increaseFarmerXP(double amount) {
         farmerXP += amount;
 
         if (farmerXP >= farmerRequiredXP) {
@@ -371,9 +376,9 @@ public class PlayerSkills {
             farmerXP = 0;
             farmerLevel++;
             farmerRequiredXP = farmerRequiredXPPerLevel.get(farmerLevel - 1);
-            p.playSound(p, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-            p.sendMessage(ChatColor.GREEN + "Farmer level up! [" + farmerLevel + "]");
-            PlayerStats ps = PlayerStats.getPlayerStats(p);
+            owningPlayer.playSound(owningPlayer, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+            owningPlayer.sendMessage(ChatColor.GREEN + "Farmer level up! [" + farmerLevel + "]");
+            PlayerStats ps = PlayerStats.getPlayerStats(owningPlayer);
 
             switch (farmerLevel) {
                 case 1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24, 26, 27, 28, 29, 31, 32, 33, 34, 36, 37, 38, 39 -> {
@@ -386,11 +391,11 @@ public class PlayerSkills {
                 case 20 -> {
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
+                    owningPlayer.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                 }
                 case 40 -> {
-                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + p.getName() + " has reached the max level [" + farmerLevel + "] for Farmer!");
-                    p.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
+                    Bukkit.broadcastMessage(ChatColor.GOLD + "Congratulations! " + owningPlayer.getName() + " has reached the max level [" + farmerLevel + "] for Farmer!");
+                    owningPlayer.sendMessage(ChatColor.GOLD + "Ultimate Skill unlocked: [WORK IN PROGRESS]");
                     ps.setTotalActionsRequired(ps.getTotalActionsRequired() * 0.98);
                     ps.setEarningMultiplier(ps.getEarningMultiplier() + 0.05);
                     for (Player t : Bukkit.getOnlinePlayers()) {

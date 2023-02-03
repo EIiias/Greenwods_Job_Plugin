@@ -1,5 +1,6 @@
 package Events;
 
+import Commands.BackpackCommand;
 import PlayerData.PlayerStats;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,7 +14,8 @@ public class OnPlayerQuit implements Listener {
         Player p = e.getPlayer();
 
         PlayerStats ps = PlayerStats.getPlayerStats(p);
-        ps.savePlayerStatsInRam();
+        ps.saveStatsYAML();
+        BackpackCommand.backpackList.remove(p);
         PlayerStats.removePlayerStats(p);
     }
 }

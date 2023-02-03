@@ -1,12 +1,10 @@
 package PlayerData;
 
 import Jobs.Jobs;
-import PlayerData.PlayerStats;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +14,6 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
 public class MaterialHandler {
@@ -25,9 +22,11 @@ public class MaterialHandler {
     Class Variables
      */
 
+    public Player owningPlayer;
+
     private HashMap<Material, Double> materialValue = new HashMap<>();
     private HashMap<Material, String> materialName = new HashMap<>();
-    private HashMap<Material, String> materialOccupationOwner = new HashMap<>();
+    private static HashMap<Material, String> materialOccupationOwner = new HashMap<>();
     private HashMap<Material, Material> materialAliases = new HashMap<>();
 
     public ArrayList<ItemStack> customFishingLoot = new ArrayList<>();
@@ -42,7 +41,9 @@ public class MaterialHandler {
     Class constructor
      */
 
-    public MaterialHandler() {
+    public MaterialHandler(Player p) {
+
+        owningPlayer = p;
 
         /*
         Material Value
@@ -218,8 +219,8 @@ public class MaterialHandler {
      */
 
     //Check if Materials is part of player occupation
-    public boolean isJobMaterial(Player p, Material m) {
-        PlayerStats ps = PlayerStats.getPlayerStats(p);
+    public boolean isJobMaterial(Material m) {
+        PlayerStats ps = PlayerStats.getPlayerStats(owningPlayer);
 
         if (hasAlias(m)) {
             m = getAlias(m);
@@ -248,6 +249,7 @@ public class MaterialHandler {
         return materialValue.get(m);
     }
 
+    //Functions to make custom fishes
     public ItemStack createCustomFish(ItemStack fish, Double fishValue, String fishName, String rarity) {
 
         //Get item meta
@@ -295,5 +297,14 @@ public class MaterialHandler {
         fish.setItemMeta(fishItemMeta);
 
         return fish;
+    }
+
+    //Get the owning job
+    public static String getOwningJob(Material m) {
+        String occupationOwner = materialOccupationOwner.get(m);
+        if (occupationOwner == null) {
+             occupationOwner = "";
+        }
+        return occupationOwner;
     }
 }

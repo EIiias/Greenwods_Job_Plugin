@@ -9,6 +9,7 @@ commands:
   job:
     description: show balance
   backpack:
+    aliases: bp
     description: Work in progress
 permissions:
   jobs.command.selectJob:
@@ -25,5 +26,7 @@ permissions:
       jobs.command.selectJobAdmin: true
       jobs.command.showJobScoreboard: true
       jobs.command.hideJobScoreboard: true
-
-
+  jobs.recipe.sixPlanks:
+    description: Craft six planks from one log
+  jobs.command.backpackSee:
+    description: Work in progress

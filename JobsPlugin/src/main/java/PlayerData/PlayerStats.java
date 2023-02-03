@@ -1,13 +1,19 @@
 package PlayerData;
 
+import Commands.BackpackCommand;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import Math.CustomMath;
 import Economy.Vault;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
+import javax.swing.text.StyledEditorKit;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -18,13 +24,13 @@ public class PlayerStats {
     Class Variables
      */
 
-    private Player owningPlayer;
+    public Player owningPlayer;
 
     private String jobName = "unemployed";
 
-    public MaterialHandler materialHandler = new MaterialHandler();
+    private MaterialHandler materialHandler;
 
-    public PlayerSkills playerSkills = new PlayerSkills();
+    private PlayerSkills playerSkills;
 
     private double totalActionsRequired = 64;
 
@@ -32,10 +38,16 @@ public class PlayerStats {
 
     private double baseWage = 5;
 
-    private double earningMultiplier = 1;
+    private double earningsMultiplier = 1;
 
     public Location lastFishingPosition = null;
     public Boolean autoFishFlag = false;
+
+    public Boolean timberSkill = false;
+    public Boolean timberSkillCooldown = false;
+
+    public int backPackSize = 9;
+    public ItemStack[] backpackContents = {new ItemStack(Material.AIR)};
 
     private ArrayList<String> saveStatsNames = new ArrayList<>();
 
@@ -47,6 +59,13 @@ public class PlayerStats {
         playerStats.put(p.getUniqueId(), this);
         owningPlayer = p;
 
+        //Create material handler instance for player
+        materialHandler = new MaterialHandler(p);
+
+        //Create player skills instance for player
+        playerSkills = new PlayerSkills(p);
+
+        //Name of the save stats found in the file
         saveStatsNames.add("occupation");
         saveStatsNames.add("earningsmultiplier");
         saveStatsNames.add("actionsrequired");
@@ -59,6 +78,8 @@ public class PlayerStats {
         saveStatsNames.add("fisherXP");
         saveStatsNames.add("farmerLevel");
         saveStatsNames.add("farmerXP");
+
+        loadStatsYAML();
     }
 
     /*
@@ -86,11 +107,11 @@ public class PlayerStats {
     }
 
     public double getEarningMultiplier() {
-        return earningMultiplier;
+        return earningsMultiplier;
     }
 
     public void setEarningMultiplier(double earningMultiplier) {
-        this.earningMultiplier = earningMultiplier;
+        this.earningsMultiplier = earningMultiplier;
     }
 
     //Keeps tracks if player should get money and level up
@@ -99,15 +120,17 @@ public class PlayerStats {
 
         switch (jobName) {
             case "lumberjack" -> {
-                playerSkills.increaseLumberjackXP(owningPlayer, amount);
+                playerSkills.increaseLumberjackXP(amount);
             }
             case "miner" -> {
-                playerSkills.increaseMinerXP(owningPlayer, amount);
+                playerSkills.increaseMinerXP(amount);
             }
             case "farmer" -> {
-                 playerSkills.increaseFarmerXP(owningPlayer, amount);
+                 playerSkills.increaseFarmerXP(amount);
             }
-            //Since fisher works different it's not here
+            case "fisher" -> {
+                playerSkills.increaseFisherXP(amount);
+            }
         }
 
         //Check if player has done enough actions for the next reward and reset if yes
@@ -115,8 +138,8 @@ public class PlayerStats {
             actionsRequired = CustomMath.randomNumber(90, 110) * (totalActionsRequired / 100);
             Economy economy = Vault.getEconomy();
             double random = CustomMath.randomNumber((int) (baseWage * 90) / 100, (int) (baseWage * 110) / 100);
-            economy.depositPlayer(owningPlayer, earningMultiplier * random);
-            owningPlayer.sendMessage(ChatColor.GREEN + "You got awarded " + CustomMath.truncate(random * earningMultiplier, 2)  + " Woodcoins!");
+            economy.depositPlayer(owningPlayer, earningsMultiplier * random);
+            owningPlayer.sendActionBar(ChatColor.GOLD + "You got awarded " + CustomMath.truncate(random * earningsMultiplier, 2) + " Woodcoins!");
         }
     }
 
@@ -186,54 +209,138 @@ public class PlayerStats {
         }
     }
 
-    public void savePlayerStatsInRam() {
-
-        ArrayList<String> statsToSave = getAllStatsInRam();
-
-        //Write stats to file
-        File psfp = new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId() + "/stats.ini");
-        BufferedWriter writer;
-        try {
-            writer = new BufferedWriter(new FileWriter(psfp));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void loadBackpack() {
+        if (!BackpackCommand.backpackList.containsKey(owningPlayer)) {
+            Inventory bp = Bukkit.createInventory(owningPlayer, PlayerStats.getPlayerStats(owningPlayer).backPackSize, "Backpack of " + owningPlayer.getName());
+            BackpackCommand.backpackList.put(owningPlayer, bp);
+            bp.setContents(PlayerStats.getPlayerStats(owningPlayer).backpackContents);
         }
+    }
 
-        for (int i = 0; i < statsToSave.size(); i++) {
-            if (statsToSave.get(i) == null) {
-                statsToSave.set(i, "");
-            }
-            try {
-                writer.write(saveStatsNames.get(i) + "=" + statsToSave.get(i));
-                writer.newLine();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public PlayerSkills getSkills() {
+        return playerSkills;
+    }
+
+    public MaterialHandler getMaterialHandler() {
+        return materialHandler;
+    }
+
+    public void saveStatsYAML() {
+
+        File playerStatsFile = new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId(), "stats.yml");
+
+        YamlConfiguration playerStatsFileYAML = YamlConfiguration.loadConfiguration(playerStatsFile);
+
+
+
+
+        playerStatsFileYAML.options().setHeader(Arrays.asList("Player Stats for " + owningPlayer.getName() + " (last known name)"));
+
+        playerStatsFileYAML.set("Occupation", getPlayerStats(owningPlayer).getJobName());
+        playerStatsFileYAML.setComments("Occupation", Arrays.asList("Last saved occupation of the player"));
+
+        playerStatsFileYAML.set("EarningsMultiplier", getPlayerStats(owningPlayer).getEarningMultiplier());
+        playerStatsFileYAML.setComments("EarningsMultiplier", Arrays.asList("Earnings multiplier"));
+
+        playerStatsFileYAML.set("ActionsRequired", getPlayerStats(owningPlayer).actionsRequired);
+        playerStatsFileYAML.setComments("ActionsRequired", Arrays.asList("Actions required until next reward"));
+
+        playerStatsFileYAML.set("TotalActionsRequired", getPlayerStats(owningPlayer).actionsRequired);
+        playerStatsFileYAML.setComments("TotalActionsRequired", Arrays.asList("The reset value for actions required when actions required is <=0"));
+
+        playerStatsFileYAML.set("BackpackSize", getPlayerStats(owningPlayer).backPackSize);
+        playerStatsFileYAML.setComments("BackpackSize", Arrays.asList("", "The amount of slots the player backpack has (Warning: needs to be multiple of 9)"));
+
+        playerStatsFileYAML.set("BackpackContents", backpackContents);
+        playerStatsFileYAML.setComments("BackpackContents", Arrays.asList("", "Items currently in the player's backpack"));
+
+        playerStatsFileYAML.set("lumberjackLevel", getPlayerStats(owningPlayer).getSkills().lumberjackLevel);
+        playerStatsFileYAML.setComments("lumberjackLevel", Arrays.asList("", "Player skills", "", "Lumberjack skills"));
+        playerStatsFileYAML.set("lumberjackXP", getPlayerStats(owningPlayer).getSkills().lumberjackXP);
+        playerStatsFileYAML.set("lumberjackRequiredXP", getPlayerStats(owningPlayer).getSkills().lumberjackRequiredXP);
+
+        playerStatsFileYAML.set("minerLevel", getPlayerStats(owningPlayer).getSkills().minerLevel);
+        playerStatsFileYAML.setComments("minerLevel", Arrays.asList("", "Miner skills"));
+        playerStatsFileYAML.set("minerXP", getPlayerStats(owningPlayer).getSkills().minerXP);
+        playerStatsFileYAML.set("minerRequiredXP", getPlayerStats(owningPlayer).getSkills().minerRequiredXP);
+
+        playerStatsFileYAML.set("farmerLevel", getPlayerStats(owningPlayer).getSkills().farmerLevel);
+        playerStatsFileYAML.setComments("farmerLevel", Arrays.asList("", "Farmer skills"));
+        playerStatsFileYAML.set("farmerXP", getPlayerStats(owningPlayer).getSkills().farmerXP);
+        playerStatsFileYAML.set("farmerRequiredXP", getPlayerStats(owningPlayer).getSkills().farmerRequiredXP);
+
+        playerStatsFileYAML.set("fisherLevel", getPlayerStats(owningPlayer).getSkills().fisherLevel);
+        playerStatsFileYAML.setComments("fisherLevel", Arrays.asList("", "Fisher skills"));
+        playerStatsFileYAML.set("fisherXP", getPlayerStats(owningPlayer).getSkills().fisherXP);
+        playerStatsFileYAML.set("fisherRequiredXP", getPlayerStats(owningPlayer).getSkills().fisherRequiredXP);
+
+        playerStatsFileYAML.set("TimberSkill", getPlayerStats(owningPlayer).timberSkill);
+        playerStatsFileYAML.setComments("TimberSkill", Arrays.asList("", "Player unlocked skills", ""));
+
         try {
-            writer.close();
+            playerStatsFileYAML.save(new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId(), "stats.yml"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public ArrayList<String> getAllStatsInRam() {
-        ArrayList<String> stats = new ArrayList<>();
+    public void loadStatsYAML() {
 
-        stats.add(getJobName());
-        stats.add(String.valueOf(getEarningMultiplier()));
-        stats.add(String.valueOf(getActionsRequired()));
-        stats.add(String.valueOf(getTotalActionsRequired()));
-        stats.add(String.valueOf(playerSkills.lumberjackLevel));
-        stats.add(String.valueOf(playerSkills.lumberjackXP));
-        stats.add(String.valueOf(playerSkills.minerLevel));
-        stats.add(String.valueOf(playerSkills.minerXP));
-        stats.add(String.valueOf(playerSkills.fisherLevel));
-        stats.add(String.valueOf(playerSkills.fisherXP));
-        stats.add(String.valueOf(playerSkills.farmerLevel));
-        stats.add(String.valueOf(playerSkills.farmerXP));
+        //Create [PluginFolder]/JobsPlugin/players/[Player UUID] directory if nonexistent
+        if (!new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId()).exists()) {
+            File pf = new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId());
+            pf.mkdir();
+        }
 
-        return stats;
+        //Check if the old version for the player stats file is still existing
+        if (new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId() + "/stats.ini").exists()) {
+            System.out.println("[Jobs] Outdated save stats formating for player " + owningPlayer.getName() + " found! Migrating to new format...");
+            loadPlayerStatsToRam(this);
+            saveStatsYAML();
+            new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId() + "/stats.ini").delete();
+            return;
+        //Check if player save data is available
+        } else if (!(new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId() + "/stats.yml").exists())) {
+            System.out.println("[Jobs] No save data found for player " + owningPlayer.getName() + "! Creating new...");
+            saveStatsYAML();
+            return;
+        }
+
+        File playerStatsFile = new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId(), "stats.yml");
+
+        YamlConfiguration playerStatsFileYAML = YamlConfiguration.loadConfiguration(playerStatsFile);
+
+        //Load basic stats
+        getPlayerStats(owningPlayer).jobName = (String) playerStatsFileYAML.get("Occupation");
+        getPlayerStats(owningPlayer).earningsMultiplier = (double) playerStatsFileYAML.get("EarningsMultiplier");
+        getPlayerStats(owningPlayer).actionsRequired = (double) playerStatsFileYAML.get("ActionsRequired");
+        getPlayerStats(owningPlayer).totalActionsRequired = (double) playerStatsFileYAML.get("TotalActionsRequired");
+        getPlayerStats(owningPlayer).backPackSize = (int) playerStatsFileYAML.get("BackpackSize");
+        getPlayerStats(owningPlayer).backpackContents = ((List<ItemStack>) playerStatsFileYAML.get("BackpackContents")).toArray(new ItemStack[0]);
+        loadBackpack();
+
+        //Load data for lumberjack
+        getPlayerStats(owningPlayer).getSkills().lumberjackLevel = (int) playerStatsFileYAML.get("lumberjackLevel");
+        getPlayerStats(owningPlayer).getSkills().lumberjackXP = (double) playerStatsFileYAML.get("lumberjackXP");
+        getPlayerStats(owningPlayer).getSkills().lumberjackRequiredXP = (double) playerStatsFileYAML.get("lumberjackRequiredXP");
+
+        //Load data for miner
+        getPlayerStats(owningPlayer).getSkills().minerLevel = (int) playerStatsFileYAML.get("minerLevel");
+        getPlayerStats(owningPlayer).getSkills().minerXP = (double) playerStatsFileYAML.get("minerXP");
+        getPlayerStats(owningPlayer).getSkills().minerRequiredXP = (double) playerStatsFileYAML.get("minerRequiredXP");
+
+        //Load data for farmer
+        getPlayerStats(owningPlayer).getSkills().farmerLevel = (int) playerStatsFileYAML.get("farmerLevel");
+        getPlayerStats(owningPlayer).getSkills().farmerXP = (double) playerStatsFileYAML.get("farmerXP");
+        getPlayerStats(owningPlayer).getSkills().farmerRequiredXP = (double) playerStatsFileYAML.get("farmerRequiredXP");
+
+        //Load data for fisher
+        getPlayerStats(owningPlayer).getSkills().fisherLevel = (int) playerStatsFileYAML.get("fisherLevel");
+        getPlayerStats(owningPlayer).getSkills().fisherXP = (double) playerStatsFileYAML.get("fisherXP");
+        getPlayerStats(owningPlayer).getSkills().fisherRequiredXP = (double) playerStatsFileYAML.get("fisherRequiredXP");
+
+        //Load unlocked skills
+        getPlayerStats(owningPlayer).timberSkill = (boolean) playerStatsFileYAML.get("TimberSkill");
     }
 
     /*

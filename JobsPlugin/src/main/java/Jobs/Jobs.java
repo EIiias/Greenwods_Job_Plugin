@@ -1,18 +1,17 @@
 package Jobs;
 
 import java.io.*;
-import java.nio.file.Files;
 
 import Commands.JobCommand;
 import Commands.SkillsCommand;
 import Events.*;
-import GUI.Inventories.FisherBackpack;
+import Commands.BackpackCommand;
 import PlayerData.PlayerStats;
-import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -23,6 +22,8 @@ import Economy.Vault;
 public final class Jobs extends JavaPlugin implements Listener {
 
     private static Jobs instance;
+
+    public static ShapedRecipe sixOakPlanksRecipe = null;
 
     @Override
     public void onEnable() {
@@ -54,8 +55,7 @@ public final class Jobs extends JavaPlugin implements Listener {
         getCommand("job").setTabCompleter(new JobCommand());
         getCommand("skills").setExecutor(new SkillsCommand());
         getCommand("skills").setTabCompleter(new SkillsCommand());
-        getCommand("backpack").setExecutor(new FisherBackpack());
-        getCommand("backpack").setExecutor(new FisherBackpack());
+        getCommand("backpack").setExecutor(new BackpackCommand());
 
         //Register Event Listener
         Bukkit.getServer().getPluginManager().registerEvents(new OnBlockBreak(), this);
@@ -76,24 +76,19 @@ public final class Jobs extends JavaPlugin implements Listener {
             PlayerStats ps = new PlayerStats(p);
 
             //Load player stats if available!
-            if (new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + p.getUniqueId() + "/stats.ini").exists()) {
-                ps.loadPlayerStatsToRam(ps); //Load stats if available
-            } else {
-                p.sendMessage(ChatColor.RED + "No player stats found!");
+            if (new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + p.getUniqueId() + "/stats.yml").exists()) {
+                ps.loadStatsYAML(); //Load player stats if available
             }
         }
 
         //Custom Crafting test
-        NamespacedKey customRecipeKey = new NamespacedKey(this, "test_item");
+        //NamespacedKey sixOakPlankKey = new NamespacedKey(this, "lumberjack_plank");
 
-        ItemStack customRecipeItem = new ItemStack(Material.OAK_PLANKS, 6);
+        //ItemStack sixOakPlanksItem = new ItemStack(Material.OAK_PLANKS, 6);
 
-        ShapedRecipe testRecipe = new ShapedRecipe(customRecipeKey, customRecipeItem);
-        testRecipe.shape("   ", "   ", " % ");
-        testRecipe.shape("% ", "  ");
-        testRecipe.setIngredient('%', Material.COD);
-
-        getServer().addRecipe(testRecipe);
+        //sixOakPlanksRecipe = new ShapedRecipe(sixOakPlankKey, sixOakPlanksItem);
+        //sixOakPlanksRecipe.shape("%");
+        //sixOakPlanksRecipe.setIngredient('%', Material.OAK_LOG);
 
         System.out.println("Started Jobs plugin!");
     }
@@ -104,7 +99,7 @@ public final class Jobs extends JavaPlugin implements Listener {
 
         //Save stats for all online players
         for (Player p : Bukkit.getOnlinePlayers()) {
-            PlayerStats.getPlayerStats(p).savePlayerStatsInRam();
+            PlayerStats.getPlayerStats(p).saveStatsYAML();
         }
         System.out.println("Stopped Jobs plugin!");
     }

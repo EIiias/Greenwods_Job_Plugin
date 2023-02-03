@@ -1,5 +1,6 @@
 package Events;
 
+import Commands.BackpackCommand;
 import GUI.Inventories.SkillTree;
 import Jobs.Jobs;
 import PlayerData.PlayerStats;
@@ -11,6 +12,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+
+import java.util.Objects;
 
 public class OnInventoryClose implements Listener {
     @EventHandler

@@ -30,7 +30,7 @@ public class SkillTree {
     public SkillTree(Player p) {
 
         owningPlayer = p;
-        playerSkills = PlayerStats.getPlayerStats(owningPlayer).playerSkills;
+        playerSkills = PlayerStats.getPlayerStats(owningPlayer).getSkills();
 
         Inventory skillTreeMenu = Bukkit.createInventory(owningPlayer, 9, "Skill Tree of " + owningPlayer.getName());
         skillTreeInventoryList.put(skillTreeMenu, this);
@@ -66,7 +66,7 @@ public class SkillTree {
     public void lumberjackSkillTree() {
         Inventory skillTreeMenu = Bukkit.createInventory(owningPlayer, 45, owningPlayer.getName() + " - Lumberjack");
         skillTreeInventoryList.put(skillTreeMenu, this);
-        PlayerSkills pSkills = PlayerStats.getPlayerStats(owningPlayer).playerSkills;
+        PlayerSkills pSkills = PlayerStats.getPlayerStats(owningPlayer).getSkills();
 
         for (int i = 0; i < 40; i++) {
             if (i + 1 <= pSkills.lumberjackLevel) {
@@ -86,7 +86,7 @@ public class SkillTree {
             }
         }
 
-        //Create back button and represent as player's head
+        //Create back button represented as player's head
         ItemStack backButton = new ItemStack(Material.PLAYER_HEAD);
 
         SkullMeta backButtonMeta = (SkullMeta) backButton.getItemMeta();

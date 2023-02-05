@@ -111,8 +111,10 @@ public class OnBlockBreak implements Listener {
                 if (blocksToBreak.get(i).hasMetadata("PlacedByPlayer")) {
                     blocksToBreak.get(i).removeMetadata("PlacedByPlayer", Jobs.getInstance());
                 } else {
-                    //Decrease Actions required
-                    PlayerStats.getPlayerStats(p).decreaseActionsRequired(PlayerStats.getPlayerStats(p).getMaterialHandler().getMaterialValue(blocksToBreak.get(i).getType()));
+                    if (PlayerStats.getPlayerStats(p).getMaterialHandler().isJobMaterial(blocksToBreak.get(i).getType())) {
+                        //Decrease Actions required
+                        PlayerStats.getPlayerStats(p).decreaseActionsRequired(PlayerStats.getPlayerStats(p).getMaterialHandler().getMaterialValue(blocksToBreak.get(i).getType()));
+                    }
                 }
 
                 //Break the block

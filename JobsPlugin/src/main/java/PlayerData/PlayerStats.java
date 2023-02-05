@@ -49,6 +49,8 @@ public class PlayerStats {
     public int backPackSize = 9;
     public ItemStack[] backpackContents = {new ItemStack(Material.AIR)};
 
+    public ItemStack[] fisherBackpackContents = {new ItemStack(Material.AIR)};
+
     private ArrayList<String> saveStatsNames = new ArrayList<>();
 
     /*
@@ -118,20 +120,7 @@ public class PlayerStats {
     public void decreaseActionsRequired(double amount) {
         actionsRequired -= amount;
 
-        switch (jobName) {
-            case "lumberjack" -> {
-                playerSkills.increaseLumberjackXP(amount);
-            }
-            case "miner" -> {
-                playerSkills.increaseMinerXP(amount);
-            }
-            case "farmer" -> {
-                 playerSkills.increaseFarmerXP(amount);
-            }
-            case "fisher" -> {
-                playerSkills.increaseFisherXP(amount);
-            }
-        }
+        playerSkills.increaseJobXP(amount, jobName);
 
         //Check if player has done enough actions for the next reward and reset if yes
         if (actionsRequired <= 0.0) {
@@ -210,9 +199,9 @@ public class PlayerStats {
     }
 
     public void loadBackpack() {
-        if (!BackpackCommand.backpackList.containsKey(owningPlayer)) {
+        if (!backpackList.containsKey(owningPlayer)) {
             Inventory bp = Bukkit.createInventory(owningPlayer, PlayerStats.getPlayerStats(owningPlayer).backPackSize, "Backpack of " + owningPlayer.getName());
-            BackpackCommand.backpackList.put(owningPlayer, bp);
+            backpackList.put(owningPlayer, bp);
             bp.setContents(PlayerStats.getPlayerStats(owningPlayer).backpackContents);
         }
     }
@@ -251,6 +240,7 @@ public class PlayerStats {
         playerStatsFileYAML.set("BackpackSize", getPlayerStats(owningPlayer).backPackSize);
         playerStatsFileYAML.setComments("BackpackSize", Arrays.asList("", "The amount of slots the player backpack has (Warning: needs to be multiple of 9)"));
 
+        backpackContents = PlayerStats.backpackList.get(owningPlayer).getContents();
         playerStatsFileYAML.set("BackpackContents", backpackContents);
         playerStatsFileYAML.setComments("BackpackContents", Arrays.asList("", "Items currently in the player's backpack"));
 
@@ -287,33 +277,33 @@ public class PlayerStats {
     public void loadStatsYAML() {
 
         //Create [PluginFolder]/JobsPlugin/players/[Player UUID] directory if nonexistent
-        if (!new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId()).exists()) {
-            File pf = new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId());
+        if (!new File(Bukkit.getPluginsFolder() + "/GreenwoodsJobs/players/" + owningPlayer.getUniqueId()).exists()) {
+            File pf = new File(Bukkit.getPluginsFolder() + "/GreenwoodsJobs/players/" + owningPlayer.getUniqueId());
             pf.mkdir();
         }
 
         //Check if the old version for the player stats file is still existing
-        if (new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId() + "/stats.ini").exists()) {
-            System.out.println("[Jobs] Outdated save stats formating for player " + owningPlayer.getName() + " found! Migrating to new format...");
+        if (new File(Bukkit.getPluginsFolder() + "/GreenwoodsJobs/players/" + owningPlayer.getUniqueId() + "/stats.ini").exists()) {
+            Bukkit.getLogger().fine("[Jobs] Outdated save stats formating for player " + owningPlayer.getName() + " found! Migrating to new format...");
             loadPlayerStatsToRam(this);
             saveStatsYAML();
-            new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId() + "/stats.ini").delete();
+            new File(Bukkit.getPluginsFolder() + "/GreenwoodsJobs/players/" + owningPlayer.getUniqueId() + "/stats.ini").delete();
             return;
         //Check if player save data is available
-        } else if (!(new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId() + "/stats.yml").exists())) {
-            System.out.println("[Jobs] No save data found for player " + owningPlayer.getName() + "! Creating new...");
+        } else if (!(new File(Bukkit.getPluginsFolder() + "/GreenwoodsJobs/players/" + owningPlayer.getUniqueId() + "/stats.yml").exists())) {
+            Bukkit.getLogger().fine("[Jobs] No save data found for player " + owningPlayer.getName() + "! Creating new...");
             saveStatsYAML();
             return;
         }
 
-        File playerStatsFile = new File(Bukkit.getPluginsFolder() + "/JobsPlugin/players/" + owningPlayer.getUniqueId(), "stats.yml");
+        File playerStatsFile = new File(Bukkit.getPluginsFolder() + "/GreenwoodsJobs/players/" + owningPlayer.getUniqueId(), "stats.yml");
 
         YamlConfiguration playerStatsFileYAML = YamlConfiguration.loadConfiguration(playerStatsFile);
 
         //Load basic stats
-        getPlayerStats(owningPlayer).jobName = (String) playerStatsFileYAML.get("Occupation");
-        getPlayerStats(owningPlayer).earningsMultiplier = (double) playerStatsFileYAML.get("EarningsMultiplier");
-        getPlayerStats(owningPlayer).actionsRequired = (double) playerStatsFileYAML.get("ActionsRequired");
+        assert playerStatsFileYAML.get("Occupation") != null : getPlayerStats(owningPlayer).jobName = (String) playerStatsFileYAML.get("Occupation");
+        assert playerStatsFileYAML.get("EarningsMultiplier") != null : getPlayerStats(owningPlayer).earningsMultiplier = (double) playerStatsFileYAML.get("EarningsMultiplier");
+        assert playerStatsFileYAML.get("ActionsRequired") != null : getPlayerStats(owningPlayer).actionsRequired = (double) playerStatsFileYAML.get("ActionsRequired");
         getPlayerStats(owningPlayer).totalActionsRequired = (double) playerStatsFileYAML.get("TotalActionsRequired");
         getPlayerStats(owningPlayer).backPackSize = (int) playerStatsFileYAML.get("BackpackSize");
         getPlayerStats(owningPlayer).backpackContents = ((List<ItemStack>) playerStatsFileYAML.get("BackpackContents")).toArray(new ItemStack[0]);
@@ -349,13 +339,16 @@ public class PlayerStats {
 
     public static HashMap<UUID, PlayerStats> playerStats = new HashMap<UUID, PlayerStats>();
 
+    public static HashMap<Player, Inventory> backpackList = new HashMap<>();
+
     public static PlayerStats getPlayerStats(Player p) {
         return playerStats.get(p.getUniqueId());
     }
 
     public static void removePlayerStats(Player p) {
         PlayerStats ps = getPlayerStats(p);
-        playerStats.remove(p.getUniqueId());
+        PlayerStats.backpackList.remove(p);
+        PlayerStats.playerStats.remove(p.getUniqueId());
         ps = null;
     }
 }

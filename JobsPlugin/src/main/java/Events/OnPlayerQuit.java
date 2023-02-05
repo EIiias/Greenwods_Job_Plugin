@@ -13,9 +13,7 @@ public class OnPlayerQuit implements Listener {
 
         Player p = e.getPlayer();
 
-        PlayerStats ps = PlayerStats.getPlayerStats(p);
-        ps.saveStatsYAML();
-        BackpackCommand.backpackList.remove(p);
+        PlayerStats.getPlayerStats(p).saveStatsYAML();
         PlayerStats.removePlayerStats(p);
     }
 }

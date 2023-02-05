@@ -1,6 +1,7 @@
 package Jobs;
 
 import java.io.*;
+import java.util.logging.Logger;
 
 import Commands.JobCommand;
 import Commands.SkillsCommand;
@@ -32,8 +33,8 @@ public final class Jobs extends JavaPlugin implements Listener {
         instance = this;
 
         //Create [PluginFolder]/JobsPlugin directory if nonexistent
-        if (!new File(Bukkit.getPluginsFolder() + "/JobsPlugin").exists()) {
-            File jpf = new File(Bukkit.getPluginsFolder() + "/JobsPlugin");
+        if (!new File(Bukkit.getPluginsFolder() + "/GreenwoodsJobs").exists()) {
+            File jpf = new File(Bukkit.getPluginsFolder() + "/GreenwoodsJobs");
             jpf.mkdir();
         }
 
@@ -90,7 +91,7 @@ public final class Jobs extends JavaPlugin implements Listener {
         //sixOakPlanksRecipe.shape("%");
         //sixOakPlanksRecipe.setIngredient('%', Material.OAK_LOG);
 
-        System.out.println("Started Jobs plugin!");
+        Bukkit.getLogger().fine("[Jobs] Started Jobs plugin!");
     }
 
 
@@ -101,7 +102,7 @@ public final class Jobs extends JavaPlugin implements Listener {
         for (Player p : Bukkit.getOnlinePlayers()) {
             PlayerStats.getPlayerStats(p).saveStatsYAML();
         }
-        System.out.println("Stopped Jobs plugin!");
+        Bukkit.getLogger().fine("[Jobs] Stopped Jobs plugin!");
     }
 
     public static Jobs getInstance() {
